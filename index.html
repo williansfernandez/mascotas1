@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro de Mascotas Comunitarias</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>🐾 Registro de Mascotas Comunitarias 🐾</h1>
+    <p>Ayudemos a nuestras mascotas a encontrar un hogar</p>
+  </header>
+
+  <form id="formularioMascota">
+    <input type="text" id="nombre" placeholder="Nombre de la mascota" required />
+    <input type="text" id="ubicacion" placeholder="Ubicación aproximada" required />
+    <textarea id="cuidados" placeholder="Cuidados básicos" required></textarea>
+    <input type="file" id="foto" accept="image/*" />
+    <button type="submit">Registrar</button>
+  </form>
+
+  <h2>Mascotas Registradas</h2>
+  <div id="listaMascotas"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
