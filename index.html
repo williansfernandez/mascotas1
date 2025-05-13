@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,6 +10,9 @@
   <header>
     <h1>🐾 Registro de Mascotas Comunitarias 🐾</h1>
     <p>Ayudemos a nuestras mascotas a encontrar un hogar</p>
+    <a href="https://maps.google.com" target="_blank">
+      <img src="google-maps.png" alt="Google Maps" class="maps-logo">
+    </a>
   </header>
 
   <form id="formularioMascota">
@@ -18,12 +20,26 @@
     <input type="text" id="ubicacion" placeholder="Ubicación aproximada" required />
     <textarea id="cuidados" placeholder="Cuidados básicos" required></textarea>
     <input type="file" id="foto" accept="image/*" />
-    <button type="submit">Registrar</button>
+    <button type="submit">Registrar Mascota</button>
   </form>
 
   <h2>Mascotas Registradas</h2>
   <div id="listaMascotas"></div>
 
-  <script src="script.js"></script>
+  <section id="info">
+    <h2>🐶 Datos curiosos sobre mascotas callejeras en Arequipa</h2>
+    <ul>
+      <li>En Arequipa, muchas mascotas callejeras son cuidadas por vecinos solidarios.</li>
+      <li>Existen organizaciones locales que promueven la adopción responsable.</li>
+      <li>Los perros comunitarios a menudo forman parte de la rutina diaria de barrios enteros.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>🌎 Proyecto educativo para crear conciencia sobre las mascotas sin hogar</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="script.js" type="module"></script>
 </body>
 </html>
