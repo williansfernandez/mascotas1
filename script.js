@@ -1,52 +1,93 @@
-const express = require('express');
-const multer = require('multer');
-const mysql = require('mysql2/promise');
-const path = require('path');
-const router = express.Router();
+// Configuración de Firebase - usa tu propia configuración aquí
+const firebaseConfig = {
+  apiKey: "AIzaSyAynLTFAirT4tgskPxoEe5TSmHKQbkos_M",
+  authDomain: "registro-mascotas-5b60e.firebaseapp.com",
+  projectId: "registro-mascotas-5b60e",
+  storageBucket: "registro-mascotas-5b60e.appspot.com",
+  messagingSenderId: "1079594379423",
+  appId: "1:1079594379423:web:700968cf81fb80bcb19aaa"
+};
 
-// Configura multer para subir archivos en /uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
-});
-const upload = multer({ storage });
+// Inicializar Firebase
+firebase.initializeApp(firebaseConfig);
 
-// Conexión a MySQL (pon tu conexión correcta)
-const pool = mysql.createPool({
-  host: 'mysql.railway.internal', 
-  user: 'root',
-  password: 'wcFzmSOpAjphHfiPjLxbVHMNXOauRLQy',
-  database: 'railway',
-  port: 3306
-});
+// Referencias Firestore y Storage
+const db = firebase.firestore();
+const storage = firebase.storage();
 
-// POST para registrar mascota con imagen
-router.post('/', upload.single('foto'), async (req, res) => {
+// Referencias DOM
+const formulario = document.getElementById('formulario');
+const lista = document.getElementById('lista');
+
+// Función para agregar mascota al DOM
+function agregarMascotaALista(data) {
+  const div = document.createElement('div');
+  div.className = 'mascota';
+  div.innerHTML = `
+    <h3>${data.nombre}</h3>
+    <p><b>Ubicación:</b> ${data.ubicacion}</p>
+    <p><b>Cuidados:</b> ${data.cuidados}</p>
+    ${data.imagen ? `<img src="${data.imagen}" alt="${data.nombre}" />` : ''}
+  `;
+  lista.appendChild(div);
+}
+
+// Cargar mascotas desde Firestore
+async function cargarMascotas() {
+  lista.innerHTML = '';
   try {
-    const { nombre, ubicacion, cuidados } = req.body;
-    const imagen = req.file ? `/uploads/${req.file.filename}` : null;
-
-    const [result] = await pool.query(
-      'INSERT INTO mascotas (nombre, ubicacion, cuidados, imagen) VALUES (?, ?, ?, ?)',
-      [nombre, ubicacion, cuidados, imagen]
-    );
-
-    res.json({ mensaje: 'Mascota registrada', id: result.insertId });
+    const querySnapshot = await db.collection('mascotas').orderBy('fecha', 'desc').get();
+    querySnapshot.forEach(doc => {
+      agregarMascotaALista(doc.data());
+    });
   } catch (error) {
+    console.error('Error al cargar mascotas:', error);
+  }
+}
+
+// Manejar envío del formulario
+formulario.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const nombre = document.getElementById('nombre').value.trim();
+  const ubicacion = document.getElementById('ubicacion').value.trim();
+  const cuidados = document.getElementById('cuidados').value.trim();
+  const fotoInput = document.getElementById('foto');
+  const file = fotoInput.files[0];
+
+  let fotoURL = '';
+
+  if (file) {
+    try {
+      const storageRef = storage.ref();
+      const fotoRef = storageRef.child('fotos/' + Date.now() + '_' + file.name);
+      await fotoRef.put(file);
+      fotoURL = await fotoRef.getDownloadURL();
+    } catch (error) {
+      alert('Error al subir la foto');
+      console.error(error);
+      return;
+    }
+  }
+
+  try {
+    await db.collection('mascotas').add({
+      nombre,
+      ubicacion,
+      cuidados,
+      imagen: fotoURL,
+      fecha: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    alert('Mascota registrada con éxito');
+    formulario.reset();
+    cargarMascotas();
+  } catch (error) {
+    alert('Error al registrar mascota');
     console.error(error);
-    res.status(500).json({ error: 'Error al registrar mascota' });
   }
 });
 
-// GET para obtener mascotas
-router.get('/', async (req, res) => {
-  try {
-    const [rows] = await pool.query('SELECT * FROM mascotas');
-    res.json(rows);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener mascotas' });
-  }
-});
+// Cargar las mascotas al iniciar
+cargarMascotas();
 
-module.exports = router;
