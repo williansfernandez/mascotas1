@@ -1,7 +1,7 @@
 const formulario = document.getElementById('formularioMascota');
 const lista = document.getElementById('listaMascotas');
 
-formulario.addEventListener('submit', async (e) => {
+formulario.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const nombre = document.getElementById('nombre').value.trim();
@@ -9,27 +9,26 @@ formulario.addEventListener('submit', async (e) => {
   const cuidados = document.getElementById('cuidados').value.trim();
   const file = document.getElementById('foto').files[0];
 
-  let imageUrl = "";
-
   if (file) {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "mascotas_upload"); // tu preset de Cloudinary
-
-    try {
-      const response = await axios.post(
-        "https://api.cloudinary.com/v1_1/dcuzftznb/image/upload",
-        formData
-      );
-      imageUrl = response.data.secure_url;
-    } catch (error) {
-      alert("Error al subir la imagen");
-      console.error(error);
-      return;
-    }
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      agregarMascotaALista({
+        nombre,
+        ubicacion,
+        cuidados,
+        imagen: event.target.result, // base64 local
+      });
+    };
+    reader.readAsDataURL(file);
+  } else {
+    agregarMascotaALista({
+      nombre,
+      ubicacion,
+      cuidados,
+      imagen: "", // sin imagen
+    });
   }
 
-  agregarMascotaALista({ nombre, ubicacion, cuidados, imagen: imageUrl });
   formulario.reset();
 });
 
