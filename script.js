@@ -1,5 +1,5 @@
-const formulario = document.getElementById('formulario');
-const lista = document.getElementById('lista');
+const formulario = document.getElementById('formularioMascota');
+const lista = document.getElementById('listaMascotas');
 
 formulario.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -23,7 +23,7 @@ formulario.addEventListener('submit', async (e) => {
       );
       imageUrl = response.data.secure_url;
     } catch (error) {
-      alert('Error al subir imagen');
+      alert("Error al subir la imagen");
       console.error(error);
       return;
     }
@@ -38,8 +38,8 @@ function agregarMascotaALista(data) {
   div.className = 'mascota';
   div.innerHTML = `
     <h3>${data.nombre}</h3>
-    <p><b>📍 Ubicación:</b> ${data.ubicacion}</p>
-    <p><b>🩺 Cuidados:</b> ${data.cuidados}</p>
+    <p><strong>📍 Ubicación:</strong> ${data.ubicacion}</p>
+    <p><strong>🩺 Cuidados:</strong> ${data.cuidados}</p>
     ${data.imagen ? `<img src="${data.imagen}" alt="${data.nombre}" />` : ''}
   `;
   lista.appendChild(div);
