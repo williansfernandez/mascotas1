@@ -2,44 +2,38 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Registro de Mascotas Comunitarias</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registro y Control de Mascotas Comunitarias</title>
+  <style>
+    /* Estilos básicos para que se vea decente */
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    form { margin-bottom: 20px; }
+    input, textarea { display: block; margin: 10px 0; width: 300px; }
+    img { max-width: 100px; display: block; margin-top: 10px; }
+    .mascota { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; width: 320px; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>🐾 Registro de Mascotas Comunitarias 🐾</h1>
-    <p>Ayudemos a nuestras mascotas a encontrar un hogar</p>
-    <a href="https://maps.google.com" target="_blank">
-      <img src="google-maps.png" alt="Google Maps" class="maps-logo">
-    </a>
-  </header>
 
-  <form id="formularioMascota">
-    <input type="text" id="nombre" placeholder="Nombre de la mascota" required />
-    <input type="text" id="ubicacion" placeholder="Ubicación aproximada" required />
-    <textarea id="cuidados" placeholder="Cuidados básicos" required></textarea>
-    <input type="file" id="foto" accept="image/*" />
-    <button type="submit">Registrar Mascota</button>
+  <h1>Registro de Mascotas Comunitarias</h1>
+
+  <form id="formulario">
+    <input id="nombre" type="text" placeholder="Nombre de la mascota" required />
+    <input id="ubicacion" type="text" placeholder="Ubicación" required />
+    <textarea id="cuidados" placeholder="Cuidados especiales" rows="3"></textarea>
+    <input id="foto" type="file" accept="image/*" />
+    <button type="submit">Registrar mascota</button>
   </form>
 
-  <h2>Mascotas Registradas</h2>
-  <div id="listaMascotas"></div>
+  <div id="lista"></div>
 
-  <section id="info">
-    <h2>🐶 Datos curiosos sobre mascotas callejeras en Arequipa</h2>
-    <ul>
-      <li>En Arequipa, muchas mascotas callejeras son cuidadas por vecinos solidarios.</li>
-      <li>Existen organizaciones locales que promueven la adopción responsable como: Patitas Arequipa, ARCA, Salvando Patitas, Canes de la Calle Arequipa.</li>
-      <li>Los perros comunitarios a menudo forman parte de la rutina diaria de barrios enteros.</li>
-    </ul>
-  </section>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <footer>
-    <p>🌎 Proyecto educativo para crear conciencia sobre las mascotas sin hogar</p>
-  </footer>
+  <!-- Tu script -->
+  <script src="script.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="script.js" type="module"></script>
 </body>
 </html>
