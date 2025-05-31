@@ -1,93 +1,63 @@
-// Configuración de Firebase - usa tu propia configuración aquí
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
 const firebaseConfig = {
-  apiKey: "AIzaSyAynLTFAirT4tgskPxoEe5TSmHKQbkos_M",
-  authDomain: "registro-mascotas-5b60e.firebaseapp.com",
-  projectId: "registro-mascotas-5b60e",
-  storageBucket: "registro-mascotas-5b60e.appspot.com",
-  messagingSenderId: "1079594379423",
-  appId: "1:1079594379423:web:700968cf81fb80bcb19aaa"
+  apiKey: "AIzaSyBCuFzU5PXe7gt87mK5DYvuvy7k813rCF0",
+  authDomain: "mascotas-2404b.firebaseapp.com",
+  projectId: "mascotas-2404b",
+  storageBucket: "mascotas-2404b.appspot.com",
+  messagingSenderId: "514178447311",
+  appId: "1:514178447311:web:baf57f0dce52da42a004ba"
 };
 
-// Inicializar Firebase
-firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const formulario = document.getElementById('formularioMascota');
+const lista = document.getElementById('listaMascotas');
 
-// Referencias Firestore y Storage
-const db = firebase.firestore();
-const storage = firebase.storage();
-
-// Referencias DOM
-const formulario = document.getElementById('formulario');
-const lista = document.getElementById('lista');
-
-// Función para agregar mascota al DOM
-function agregarMascotaALista(data) {
-  const div = document.createElement('div');
-  div.className = 'mascota';
-  div.innerHTML = `
-    <h3>${data.nombre}</h3>
-    <p><b>Ubicación:</b> ${data.ubicacion}</p>
-    <p><b>Cuidados:</b> ${data.cuidados}</p>
-    ${data.imagen ? `<img src="${data.imagen}" alt="${data.nombre}" />` : ''}
-  `;
-  lista.appendChild(div);
-}
-
-// Cargar mascotas desde Firestore
 async function cargarMascotas() {
-  lista.innerHTML = '';
-  try {
-    const querySnapshot = await db.collection('mascotas').orderBy('fecha', 'desc').get();
-    querySnapshot.forEach(doc => {
-      agregarMascotaALista(doc.data());
-    });
-  } catch (error) {
-    console.error('Error al cargar mascotas:', error);
-  }
+  const querySnapshot = await getDocs(collection(db, "mascotas"));
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    agregarMascotaALista(data);
+  });
 }
 
-// Manejar envío del formulario
 formulario.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const nombre = document.getElementById('nombre').value.trim();
-  const ubicacion = document.getElementById('ubicacion').value.trim();
-  const cuidados = document.getElementById('cuidados').value.trim();
+  const nombre = document.getElementById('nombre').value;
+  const ubicacion = document.getElementById('ubicacion').value;
+  const cuidados = document.getElementById('cuidados').value;
   const fotoInput = document.getElementById('foto');
   const file = fotoInput.files[0];
 
-  let fotoURL = '';
-
+  let imageUrl = "";
   if (file) {
-    try {
-      const storageRef = storage.ref();
-      const fotoRef = storageRef.child('fotos/' + Date.now() + '_' + file.name);
-      await fotoRef.put(file);
-      fotoURL = await fotoRef.getDownloadURL();
-    } catch (error) {
-      alert('Error al subir la foto');
-      console.error(error);
-      return;
-    }
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "mascotas_upload");
+
+    const response = await axios.post("https://api.cloudinary.com/v1_1/dcuzftznb/image/upload", formData);
+    imageUrl = response.data.secure_url;
   }
 
-  try {
-    await db.collection('mascotas').add({
-      nombre,
-      ubicacion,
-      cuidados,
-      imagen: fotoURL,
-      fecha: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    alert('Mascota registrada con éxito');
-    formulario.reset();
-    cargarMascotas();
-  } catch (error) {
-    alert('Error al registrar mascota');
-    console.error(error);
-  }
+  const nuevaMascota = { nombre, ubicacion, cuidados, imagen: imageUrl };
+  await addDoc(collection(db, "mascotas"), nuevaMascota);
+  agregarMascotaALista(nuevaMascota);
+  formulario.reset();
 });
 
-// Cargar las mascotas al iniciar
-cargarMascotas();
+function agregarMascotaALista(data) {
+  const mascotaDiv = document.createElement('div');
+  mascotaDiv.className = 'mascota';
+  mascotaDiv.innerHTML = `
+    <h3>${data.nombre}</h3>
+    <p><strong>📍 Ubicación:</strong> ${data.ubicacion}</p>
+    <p><strong>🩺 Cuidados:</strong> ${data.cuidados}</p>
+    ${data.imagen ? `<img src="${data.imagen}" />` : ''}
+  `;
+  lista.appendChild(mascotaDiv);
+}
 
+cargarMascotas();

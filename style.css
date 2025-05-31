@@ -3,25 +3,20 @@ body {
   background: linear-gradient(to bottom right, #fff9f4, #ffe5e0);
   margin: 0;
   padding: 0;
-  position: relative; /* Para que el logo se posicione bien */
 }
-
 header {
   background: #ff6f61;
   color: white;
   padding: 30px;
   text-align: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: relative;
 }
-
 .maps-logo {
-  width: 100px;
+  width: 40px;
   position: absolute;
   top: 20px;
   right: 20px;
 }
-
 form {
   background: #ffffff;
   padding: 20px;
@@ -30,7 +25,6 @@ form {
   max-width: 600px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
-
 input, textarea, button {
   width: 100%;
   padding: 12px;
@@ -38,9 +32,7 @@ input, textarea, button {
   border-radius: 10px;
   border: 1px solid #ccc;
   font-size: 1rem;
-  box-sizing: border-box;
 }
-
 button {
   background-color: #ff6f61;
   color: white;
@@ -49,11 +41,9 @@ button {
   font-weight: bold;
   transition: background 0.3s;
 }
-
 button:hover {
   background-color: #e65a50;
 }
-
 .mascota {
   background: white;
   margin: 20px auto;
@@ -63,28 +53,23 @@ button:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
 }
-
 .mascota:hover {
   transform: translateY(-4px);
 }
-
 .mascota img {
   max-width: 100%;
   border-radius: 12px;
   margin-top: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 h2 {
   text-align: center;
   margin-top: 40px;
   font-size: 1.8rem;
   color: #444;
 }
-
 footer {
   text-align: center;
   padding: 20px;
   background-color: #f4f4f4;
-  margin-top: 40px;
 }
