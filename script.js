@@ -1,58 +1,52 @@
-const formulario = document.getElementById('formularioMascota');
-const lista = document.getElementById('listaMascotas');
+const express = require('express');
+const multer = require('multer');
+const mysql = require('mysql2/promise');
+const path = require('path');
+const router = express.Router();
 
-formulario.addEventListener('submit', async (e) => {
-  e.preventDefault();
+// Configura multer para subir archivos en /uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+});
+const upload = multer({ storage });
 
-  const nombre = document.getElementById('nombre').value;
-  const ubicacion = document.getElementById('ubicacion').value;
-  const cuidados = document.getElementById('cuidados').value;
-  const fotoInput = document.getElementById('foto');
-  const file = fotoInput.files[0];
+// Conexión a MySQL (pon tu conexión correcta)
+const pool = mysql.createPool({
+  host: 'mysql.railway.internal', 
+  user: 'root',
+  password: 'wcFzmSOpAjphHfiPjLxbVHMNXOauRLQy',
+  database: 'railway',
+  port: 3306
+});
 
-  const formData = new FormData();
-  formData.append('nombre', nombre);
-  formData.append('ubicacion', ubicacion);
-  formData.append('cuidados', cuidados);
-  if (file) formData.append('foto', file);
-
+// POST para registrar mascota con imagen
+router.post('/', upload.single('foto'), async (req, res) => {
   try {
-    const res = await axios.post('http://localhost:3000/mascotas', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    alert(res.data.mensaje);
-    formulario.reset();
-    cargarMascotas();
+    const { nombre, ubicacion, cuidados } = req.body;
+    const imagen = req.file ? `/uploads/${req.file.filename}` : null;
+
+    const [result] = await pool.query(
+      'INSERT INTO mascotas (nombre, ubicacion, cuidados, imagen) VALUES (?, ?, ?, ?)',
+      [nombre, ubicacion, cuidados, imagen]
+    );
+
+    res.json({ mensaje: 'Mascota registrada', id: result.insertId });
   } catch (error) {
-    alert('Error al registrar mascota');
     console.error(error);
+    res.status(500).json({ error: 'Error al registrar mascota' });
   }
 });
 
-async function cargarMascotas() {
+// GET para obtener mascotas
+router.get('/', async (req, res) => {
   try {
-    const res = await axios.get('http://localhost:3000/mascotas');
-    lista.innerHTML = '';
-    res.data.forEach(data => {
-      agregarMascotaALista(data);
-    });
+    const [rows] = await pool.query('SELECT * FROM mascotas');
+    res.json(rows);
   } catch (error) {
-    console.error('Error al cargar mascotas', error);
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener mascotas' });
   }
-}
+});
 
-function agregarMascotaALista(data) {
-  const mascotaDiv = document.createElement('div');
-  mascotaDiv.className = 'mascota';
-  mascotaDiv.innerHTML = `
-    <h3>${data.nombre}</h3>
-    <p><strong>📍 Ubicación:</strong> ${data.ubicacion}</p>
-    <p><strong>🩺 Cuidados:</strong> ${data.cuidados}</p>
-    ${data.imagen ? `<img src="${data.imagen}" />` : ''}
-  `;
-  lista.appendChild(mascotaDiv);
-}
-
-cargarMascotas();
+module.exports = router;
