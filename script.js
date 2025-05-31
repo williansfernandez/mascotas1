@@ -1,27 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBCuFzU5PXe7gt87mK5DYvuvy7k813rCF0",
-  authDomain: "mascotas-2404b.firebaseapp.com",
-  projectId: "mascotas-2404b",
-  storageBucket: "mascotas-2404b.appspot.com",
-  messagingSenderId: "514178447311",
-  appId: "1:514178447311:web:baf57f0dce52da42a004ba"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const formulario = document.getElementById('formularioMascota');
 const lista = document.getElementById('listaMascotas');
-
-async function cargarMascotas() {
-  const querySnapshot = await getDocs(collection(db, "mascotas"));
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
-    agregarMascotaALista(data);
-  });
-}
 
 formulario.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -32,21 +10,38 @@ formulario.addEventListener('submit', async (e) => {
   const fotoInput = document.getElementById('foto');
   const file = fotoInput.files[0];
 
-  let imageUrl = "";
-  if (file) {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "mascotas_upload");
+  const formData = new FormData();
+  formData.append('nombre', nombre);
+  formData.append('ubicacion', ubicacion);
+  formData.append('cuidados', cuidados);
+  if (file) formData.append('foto', file);
 
-    const response = await axios.post("https://api.cloudinary.com/v1_1/dcuzftznb/image/upload", formData);
-    imageUrl = response.data.secure_url;
+  try {
+    const res = await axios.post('http://localhost:3000/mascotas', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    alert(res.data.mensaje);
+    formulario.reset();
+    cargarMascotas();
+  } catch (error) {
+    alert('Error al registrar mascota');
+    console.error(error);
   }
-
-  const nuevaMascota = { nombre, ubicacion, cuidados, imagen: imageUrl };
-  await addDoc(collection(db, "mascotas"), nuevaMascota);
-  agregarMascotaALista(nuevaMascota);
-  formulario.reset();
 });
+
+async function cargarMascotas() {
+  try {
+    const res = await axios.get('http://localhost:3000/mascotas');
+    lista.innerHTML = '';
+    res.data.forEach(data => {
+      agregarMascotaALista(data);
+    });
+  } catch (error) {
+    console.error('Error al cargar mascotas', error);
+  }
+}
 
 function agregarMascotaALista(data) {
   const mascotaDiv = document.createElement('div');
