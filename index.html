@@ -1,14 +1,16 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Registro de Mascotas Comunitarias</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header>
     <h1>🐾 Registro de Mascotas Comunitarias 🐾</h1>
+    <img src="google-maps.png" alt="Google Maps" id="mapsLogo" onclick="window.open('https://www.google.com/maps', '_blank')" />
     <p>Ayudemos a nuestras mascotas a encontrar un hogar</p>
   </header>
 
@@ -23,11 +25,6 @@
   <h2>Mascotas Registradas</h2>
   <div id="listaMascotas"></div>
 
-  <a href="https://www.google.com/maps" target="_blank">
-    <img src="google-maps.png" alt="Google Maps" class="maps-logo" />
-  </a>
-
-  <script type="module" src="firebase.js"></script>
   <script type="module" src="app.js"></script>
 </body>
 </html>
