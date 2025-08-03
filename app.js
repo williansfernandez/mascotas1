@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAynLTFAirT4tgskPxoEe5TSmHKQbkos_M",
@@ -90,6 +90,44 @@ cuerpoTabla.addEventListener('input', (e) => {
     }
 });
 
+async function cargarListasGuardadas() {
+    const listasGuardadasContainer = document.getElementById('listas-guardadas');
+    listasGuardadasContainer.innerHTML = '<h3>Cargando listas...</h3>';
+
+    try {
+        const querySnapshot = await getDocs(collection(db, "listasDeCompras"));
+        if (querySnapshot.empty) {
+            listasGuardadasContainer.innerHTML = '<p>No hay listas guardadas.</p>';
+            return;
+        }
+
+        listasGuardadasContainer.innerHTML = ''; // Limpiar antes de renderizar
+        querySnapshot.forEach(doc => {
+            const lista = doc.data();
+            const fecha = lista.fecha.toDate().toLocaleString('es-ES');
+
+            const listaEl = document.createElement('div');
+            listaEl.classList.add('lista-guardada');
+
+            let itemsHtml = '<ul>';
+            lista.items.forEach(item => {
+                itemsHtml += `<li>${item.nombre} - Cantidad: ${item.cantidad}, Subtotal: S/ ${item.subtotal.toFixed(2)}</li>`;
+            });
+            itemsHtml += '</ul>';
+
+            listaEl.innerHTML = `
+                <h4>Lista del ${fecha}</h4>
+                <p><strong>Total: S/ ${lista.total.toFixed(2)}</strong></p>
+                ${itemsHtml}
+            `;
+            listasGuardadasContainer.appendChild(listaEl);
+        });
+    } catch (error) {
+        console.error("Error al cargar las listas: ", error);
+        listasGuardadasContainer.innerHTML = '<p>Error al cargar las listas.</p>';
+    }
+}
+
 btnGuardar.addEventListener('click', async () => {
     const totalTexto = precioTotalEl.textContent;
     if (confirm(`El precio total es ${totalTexto}. ¿Desea guardar la lista?`)) {
@@ -119,6 +157,7 @@ btnGuardar.addEventListener('click', async () => {
                 // Resetear cantidades
                 cuerpoTabla.querySelectorAll('.cantidad-input').forEach(input => input.value = 0);
                 calcularTotal();
+                cargarListasGuardadas(); // Recargar listas
             } catch (error) {
                 console.error("Error al guardar la lista: ", error);
                 alert('Hubo un error al guardar la lista.');
@@ -132,4 +171,5 @@ btnGuardar.addEventListener('click', async () => {
 document.addEventListener('DOMContentLoaded', () => {
     renderizarProductos();
     calcularTotal();
+    cargarListasGuardadas();
 });
