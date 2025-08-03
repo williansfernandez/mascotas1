@@ -1,6 +1,5 @@
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAynLTFAirT4tgskPxoEe5TSmHKQbkos_M",
@@ -14,57 +13,123 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const formulario = document.getElementById('formularioMascota');
-const lista = document.getElementById('listaMascotas');
+const productos = [
+    { nombre: "Huevo", precio: 0.75, unidad: "unidad" },
+    { nombre: "Yogurt griego natural", precio: 17.90, unidad: "1 litro" },
+    { nombre: "Pollo", precio: 9.50, unidad: "1 kg" },
+    { nombre: "Plátano", precio: 4.50, unidad: "1 kg" },
+    { nombre: "Jurel", precio: 11.00, unidad: "1 kg" },
+    { nombre: "Bonito", precio: 8.50, unidad: "1 kg" },
+    { nombre: "Trucha", precio: 21.00, unidad: "1 kg" },
+    { nombre: "Pejerrey limpio", precio: 25.00, unidad: "1 kg" },
+    { nombre: "Corvina", precio: 35.00, unidad: "1 kg" },
+    { nombre: "Pota", precio: 7.00, unidad: "1 kg" },
+    { nombre: "Leche fresca", precio: 3.50, unidad: "1 litro" },
+    { nombre: "Papa", precio: 3.00, unidad: "1 kg" },
+    { nombre: "Tomate", precio: 3.00, unidad: "1 kg" },
+    { nombre: "Cebolla", precio: 2.50, unidad: "1 kg" },
+    { nombre: "Zanahoria", precio: 3.00, unidad: "1 kg" },
+    { nombre: "Limón", precio: 3.00, unidad: "1 kg" },
+    { nombre: "Palta", precio: 7.00, unidad: "1 kg" },
+    { nombre: "Manzana", precio: 5.00, unidad: "1 kg" },
+    { nombre: "Pera", precio: 4.80, unidad: "1 kg" },
+    { nombre: "Papaya", precio: 4.50, unidad: "1 kg" },
+    { nombre: "Fresa", precio: 8.00, unidad: "1 kg" },
+    { nombre: "Espinaca", precio: 2.00, unidad: "1 atado" },
+    { nombre: "Brócoli", precio: 6.50, unidad: "1 kg" },
+    { nombre: "Zapallo", precio: 2.80, unidad: "1 kg" },
+    { nombre: "Camote", precio: 2.70, unidad: "1 kg" },
+    { nombre: "Arroz integral", precio: 6.00, unidad: "1 kg" },
+    { nombre: "Quinua", precio: 9.00, unidad: "1 kg" },
+    { nombre: "Lentejas", precio: 5.00, unidad: "1 kg" },
+    { nombre: "Garbanzos", precio: 6.50, unidad: "1 kg" },
+    { nombre: "Avena entera", precio: 4.00, unidad: "1 kg" },
+    { nombre: "Aceite de oliva", precio: 14.00, unidad: "500 ml" },
+    { nombre: "Pan integral", precio: 1.50, unidad: "unidad grande" },
+    { nombre: "Hígado de cordero", precio: 10.50, unidad: "1 kg" },
+    { nombre: "Carne de res (molida)", precio: 19.00, unidad: "1 kg" },
+    { nombre: "Huevos de codorniz", precio: 0.35, unidad: "unidad" },
+    { nombre: "Tofu", precio: 9.00, unidad: "500 g" }
+];
 
-async function cargarMascotas() {
-  const querySnapshot = await getDocs(collection(db, "mascotas"));
-  querySnapshot.forEach((doc) => {
-    mostrarMascota(doc.data());
-  });
+const cuerpoTabla = document.getElementById('cuerpo-tabla-productos');
+const precioTotalEl = document.getElementById('precio-total');
+const btnGuardar = document.getElementById('btn-guardar');
+
+function renderizarProductos() {
+    cuerpoTabla.innerHTML = '';
+    productos.forEach((producto, index) => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${producto.nombre} (${producto.unidad})</td>
+            <td>S/ ${producto.precio.toFixed(2)}</td>
+            <td><input type="number" min="0" value="0" class="cantidad-input" data-index="${index}"></td>
+            <td class="subtotal">S/ 0.00</td>
+        `;
+        cuerpoTabla.appendChild(fila);
+    });
 }
 
-function mostrarMascota(m) {
-  const div = document.createElement("div");
-  div.className = "mascota";
-  div.innerHTML = `
-    <h3>${m.nombre}</h3>
-    <p><strong>📍 Ubicación:</strong> ${m.ubicacion}</p>
-    <p><strong>🩺 Cuidados:</strong> ${m.cuidados}</p>
-    <img src="${m.imagen}" />
-  `;
-  lista.appendChild(div);
+function calcularTotal() {
+    let total = 0;
+    const filas = cuerpoTabla.getElementsByTagName('tr');
+    for (let i = 0; i < filas.length; i++) {
+        const fila = filas[i];
+        const precio = productos[i].precio;
+        const cantidad = fila.querySelector('.cantidad-input').value;
+        const subtotal = precio * cantidad;
+        fila.querySelector('.subtotal').textContent = `S/ ${subtotal.toFixed(2)}`;
+        total += subtotal;
+    }
+    precioTotalEl.textContent = `S/ ${total.toFixed(2)}`;
 }
 
-formulario.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const nombre = document.getElementById('nombre').value;
-  const ubicacion = document.getElementById('ubicacion').value;
-  const cuidados = document.getElementById('cuidados').value;
-  const file = document.getElementById('foto').files[0];
-
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", "mascotas_upload");
-
-  const res = await fetch("https://api.cloudinary.com/v1_1/dcuzftznb/image/upload", {
-    method: "POST",
-    body: formData
-  });
-  const data = await res.json();
-  const imagenUrl = data.secure_url;
-
-  await addDoc(collection(db, "mascotas"), {
-    nombre,
-    ubicacion,
-    cuidados,
-    imagen: imagenUrl
-  });
-
-  formulario.reset();
-  lista.innerHTML = "";
-  cargarMascotas();
+cuerpoTabla.addEventListener('input', (e) => {
+    if (e.target.classList.contains('cantidad-input')) {
+        calcularTotal();
+    }
 });
 
-cargarMascotas();
+btnGuardar.addEventListener('click', async () => {
+    const totalTexto = precioTotalEl.textContent;
+    if (confirm(`El precio total es ${totalTexto}. ¿Desea guardar la lista?`)) {
+        const listaParaGuardar = {
+            fecha: new Date(),
+            items: [],
+            total: parseFloat(totalTexto.replace('S/ ', ''))
+        };
+
+        const filas = cuerpoTabla.getElementsByTagName('tr');
+        for (let i = 0; i < filas.length; i++) {
+            const cantidad = parseInt(filas[i].querySelector('.cantidad-input').value);
+            if (cantidad > 0) {
+                listaParaGuardar.items.push({
+                    nombre: productos[i].nombre,
+                    precio: productos[i].precio,
+                    cantidad: cantidad,
+                    subtotal: productos[i].precio * cantidad
+                });
+            }
+        }
+
+        if (listaParaGuardar.items.length > 0) {
+            try {
+                await addDoc(collection(db, "listasDeCompras"), listaParaGuardar);
+                alert('¡Lista guardada con éxito!');
+                // Resetear cantidades
+                cuerpoTabla.querySelectorAll('.cantidad-input').forEach(input => input.value = 0);
+                calcularTotal();
+            } catch (error) {
+                console.error("Error al guardar la lista: ", error);
+                alert('Hubo un error al guardar la lista.');
+            }
+        } else {
+            alert('No hay productos en la lista para guardar.');
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderizarProductos();
+    calcularTotal();
+});

@@ -1,29 +1,39 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Registro de Mascotas Comunitarias</title>
+  <title>Lista de Compras Mensual</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header>
-    <h1>🐾 Registro de Mascotas Comunitarias 🐾</h1>
-    <img src="google-maps.png" alt="Google Maps" id="mapsLogo" onclick="window.open('https://www.google.com/maps', '_blank')" />
-    <p>Ayudemos a nuestras mascotas a encontrar un hogar</p>
+    <h1>🛒 Lista de Compras Mensual 🛒</h1>
+    <p>Planifica tus compras de manera sencilla</p>
   </header>
 
-  <form id="formularioMascota">
-    <input type="text" id="nombre" placeholder="Nombre de la mascota" required />
-    <input type="text" id="ubicacion" placeholder="Ubicación aproximada" required />
-    <textarea id="cuidados" placeholder="Cuidados básicos" required></textarea>
-    <input type="file" id="foto" accept="image/*" />
-    <button type="submit">Registrar Mascota</button>
-  </form>
+  <div id="lista-container">
+    <h2>Productos</h2>
+    <table id="tabla-productos">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Precio</th>
+          <th>Cantidad</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpo-tabla-productos">
+        <!-- Los productos se insertarán aquí dinámicamente -->
+      </tbody>
+    </table>
+  </div>
 
-  <h2>Mascotas Registradas</h2>
-  <div id="listaMascotas"></div>
+  <div id="resumen-container">
+    <h2>Resumen de Compra</h2>
+    <p>Total: <span id="precio-total">S/ 0.00</span></p>
+    <button id="btn-guardar">Guardar Lista</button>
+  </div>
 
   <script type="module" src="app.js"></script>
 </body>
