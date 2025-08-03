@@ -1,75 +1,168 @@
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --background-color: #f4f7f6;
+  --card-background: #ffffff;
+  --text-color: #333;
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  --border-radius: 12px;
+}
+
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f4f4f9;
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--background-color);
   margin: 0;
-  padding: 20px;
-  color: #333;
+  padding: 0;
+  color: var(--text-color);
 }
 
 header {
-  background: #5c6bc0;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   color: white;
-  padding: 20px;
+  padding: 40px 20px;
   text-align: center;
-  border-radius: 8px;
-  margin-bottom: 30px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: var(--shadow);
 }
 
-#lista-container, #resumen-container {
-  background: white;
-  padding: 20px;
-  margin: 20px auto;
-  border-radius: 8px;
-  max-width: 800px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+header h1 {
+  margin: 0;
+  font-size: 2.5em;
+  font-weight: 700;
 }
 
-h1, h2 {
-  color: #3f51b5;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-th, td {
-  text-align: left;
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-}
-
-th {
-  background-color: #e8eaf6;
-}
-
-input[type="number"] {
-  width: 60px;
-  padding: 5px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-#precio-total {
-  font-weight: bold;
+header p {
+  margin: 10px 0 0;
   font-size: 1.2em;
-  color: #d32f2f;
+  font-weight: 300;
 }
 
-button {
-  background-color: #4caf50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
+  gap: 20px;
+}
+
+#productos-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  width: 100%;
+  flex-grow: 1;
+}
+
+.producto-card {
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.producto-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.producto-card h3 {
+  margin: 0 0 10px;
+  font-size: 1.4em;
+  color: var(--primary-color);
+}
+
+.producto-card .precio-unidad {
   font-size: 1em;
-  transition: background-color 0.3s;
+  color: #555;
+  margin-bottom: 15px;
+  font-weight: 600;
 }
 
-button:hover {
-  background-color: #45a049;
+.producto-card .control-cantidad {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.producto-card input[type="number"] {
+  width: 60px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  text-align: center;
+  font-size: 1em;
+  font-family: 'Poppins', sans-serif;
+}
+
+.producto-card .subtotal {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: var(--secondary-color);
+  margin-top: auto;
+  align-self: flex-end;
+}
+
+#resumen-container {
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  width: 100%;
+  max-width: 320px;
+  position: sticky;
+  top: 20px;
+  align-self: center;
+}
+
+#resumen-container h2 {
+  text-align: center;
+  color: var(--primary-color);
+  margin-top: 0;
+}
+
+.total-section {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.5em;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+#btn-guardar {
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 15px;
+  width: 100%;
+  font-size: 1.2em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+#btn-guardar:hover {
+  background-color: #27ae60;
+  transform: scale(1.05);
+}
+
+@media (min-width: 992px) {
+  main {
+    flex-direction: row;
+  }
+  #resumen-container {
+    width: 320px;
+    align-self: flex-start;
+  }
 }
 
 #listas-guardadas-container {

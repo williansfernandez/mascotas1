@@ -47,39 +47,44 @@ const productos = [
     { nombre: "Tofu", precio: 9.00, unidad: "500 g" }
 ];
 
-const cuerpoTabla = document.getElementById('cuerpo-tabla-productos');
+const productosContainer = document.getElementById('productos-container');
 const precioTotalEl = document.getElementById('precio-total');
 const btnGuardar = document.getElementById('btn-guardar');
 
 function renderizarProductos() {
-    cuerpoTabla.innerHTML = '';
+    productosContainer.innerHTML = '';
     productos.forEach((producto, index) => {
-        const fila = document.createElement('tr');
-        fila.innerHTML = `
-            <td>${producto.nombre} (${producto.unidad})</td>
-            <td>S/ ${producto.precio.toFixed(2)}</td>
-            <td><input type="number" min="0" value="0" class="cantidad-input" data-index="${index}"></td>
-            <td class="subtotal">S/ 0.00</td>
+        const card = document.createElement('div');
+        card.className = 'producto-card';
+        card.dataset.index = index;
+        card.innerHTML = `
+            <h3>${producto.nombre}</h3>
+            <p class="precio-unidad">S/ ${producto.precio.toFixed(2)} / ${producto.unidad}</p>
+            <div class="control-cantidad">
+                <label for="cantidad-${index}">Cantidad:</label>
+                <input type="number" id="cantidad-${index}" min="0" value="0" class="cantidad-input">
+            </div>
+            <p class="subtotal">Subtotal: S/ 0.00</p>
         `;
-        cuerpoTabla.appendChild(fila);
+        productosContainer.appendChild(card);
     });
 }
 
 function calcularTotal() {
     let total = 0;
-    const filas = cuerpoTabla.getElementsByTagName('tr');
-    for (let i = 0; i < filas.length; i++) {
-        const fila = filas[i];
-        const precio = productos[i].precio;
-        const cantidad = fila.querySelector('.cantidad-input').value;
+    const cards = productosContainer.getElementsByClassName('producto-card');
+    for (const card of cards) {
+        const index = card.dataset.index;
+        const precio = productos[index].precio;
+        const cantidad = card.querySelector('.cantidad-input').value;
         const subtotal = precio * cantidad;
-        fila.querySelector('.subtotal').textContent = `S/ ${subtotal.toFixed(2)}`;
+        card.querySelector('.subtotal').textContent = `Subtotal: S/ ${subtotal.toFixed(2)}`;
         total += subtotal;
     }
     precioTotalEl.textContent = `S/ ${total.toFixed(2)}`;
 }
 
-cuerpoTabla.addEventListener('input', (e) => {
+productosContainer.addEventListener('input', (e) => {
     if (e.target.classList.contains('cantidad-input')) {
         calcularTotal();
     }
@@ -132,15 +137,18 @@ btnGuardar.addEventListener('click', async () => {
             total: parseFloat(totalTexto.replace('S/ ', ''))
         };
 
-        const filas = cuerpoTabla.getElementsByTagName('tr');
-        for (let i = 0; i < filas.length; i++) {
-            const cantidad = parseInt(filas[i].querySelector('.cantidad-input').value);
+        const cards = productosContainer.getElementsByClassName('producto-card');
+        for (const card of cards) {
+            const cantidad = parseInt(card.querySelector('.cantidad-input').value);
             if (cantidad > 0) {
+                const index = card.dataset.index;
+                const producto = productos[index];
                 listaParaGuardar.items.push({
-                    nombre: productos[i].nombre,
-                    precio: productos[i].precio,
+                    nombre: producto.nombre,
+                    precio: producto.precio,
+                    unidad: producto.unidad,
                     cantidad: cantidad,
-                    subtotal: productos[i].precio * cantidad
+                    subtotal: producto.precio * cantidad
                 });
             }
         }
@@ -150,7 +158,7 @@ btnGuardar.addEventListener('click', async () => {
                 await addDoc(collection(db, "listasDeCompras"), listaParaGuardar);
                 alert('¡Lista guardada con éxito!');
                 // Resetear cantidades
-                cuerpoTabla.querySelectorAll('.cantidad-input').forEach(input => input.value = 0);
+                productosContainer.querySelectorAll('.cantidad-input').forEach(input => input.value = 0);
                 calcularTotal();
                 cargarListasGuardadas(); // Recargar listas
             } catch (error) {
