@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAynLTFAirT4tgskPxoEe5TSmHKQbkos_M",
@@ -119,6 +119,7 @@ async function cargarListasGuardadas() {
                 <h4>Lista del ${fecha}</h4>
                 <p><strong>Total: S/ ${lista.total.toFixed(2)}</strong></p>
                 ${itemsHtml}
+                <button class="btn-editar-lista" data-id="${doc.id}">Editar</button>
                 <button class="btn-eliminar-lista" data-id="${doc.id}">Eliminar</button>
             `;
             listasGuardadasContainer.appendChild(listaEl);
@@ -172,8 +173,9 @@ btnGuardar.addEventListener('click', async () => {
 const listasGuardadasContainer = document.getElementById('listas-guardadas');
 
 listasGuardadasContainer.addEventListener('click', async (e) => {
-    if (e.target.classList.contains('btn-eliminar-lista')) {
-        const docId = e.target.dataset.id;
+    const target = e.target;
+    if (target.classList.contains('btn-eliminar-lista')) {
+        const docId = target.dataset.id;
         if (confirm('¿Estás seguro de que quieres eliminar esta lista?')) {
             try {
                 await deleteDoc(doc(db, "listasDeCompras", docId));
@@ -183,6 +185,38 @@ listasGuardadasContainer.addEventListener('click', async (e) => {
                 console.error("Error al eliminar la lista: ", error);
                 alert('Hubo un error al eliminar la lista.');
             }
+        }
+    } else if (target.classList.contains('btn-editar-lista')) {
+        const docId = target.dataset.id;
+        try {
+            const docRef = doc(db, "listasDeCompras", docId);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const lista = docSnap.data();
+                const inputs = cuerpoTabla.querySelectorAll('.cantidad-input');
+
+                inputs.forEach(input => input.value = 0);
+
+                lista.items.forEach(item => {
+                    const productoIndex = productos.findIndex(p => p.nombre === item.nombre);
+                    if (productoIndex !== -1) {
+                        const input = inputs[productoIndex];
+                        input.value = item.cantidad;
+                    }
+                });
+                calcularTotal();
+                window.scrollTo(0, 0);
+                if (confirm('La lista ha sido cargada para editar. ¿Desea eliminar la lista original al guardar los nuevos cambios?')) {
+                    await deleteDoc(doc(db, "listasDeCompras", docId));
+                    cargarListasGuardadas();
+                }
+            } else {
+                alert("No se encontró la lista para editar.");
+            }
+        } catch (error) {
+            console.error("Error al editar la lista: ", error);
+            alert('Hubo un error al editar la lista.');
         }
     }
 });
