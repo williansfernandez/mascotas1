@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAynLTFAirT4tgskPxoEe5TSmHKQbkos_M",
@@ -119,6 +119,7 @@ async function cargarListasGuardadas() {
                 <h4>Lista del ${fecha}</h4>
                 <p><strong>Total: S/ ${lista.total.toFixed(2)}</strong></p>
                 ${itemsHtml}
+                <button class="btn-eliminar-lista" data-id="${doc.id}">Eliminar</button>
             `;
             listasGuardadasContainer.appendChild(listaEl);
         });
@@ -164,6 +165,24 @@ btnGuardar.addEventListener('click', async () => {
             }
         } else {
             alert('No hay productos en la lista para guardar.');
+        }
+    }
+});
+
+const listasGuardadasContainer = document.getElementById('listas-guardadas');
+
+listasGuardadasContainer.addEventListener('click', async (e) => {
+    if (e.target.classList.contains('btn-eliminar-lista')) {
+        const docId = e.target.dataset.id;
+        if (confirm('¿Estás seguro de que quieres eliminar esta lista?')) {
+            try {
+                await deleteDoc(doc(db, "listasDeCompras", docId));
+                alert('¡Lista eliminada con éxito!');
+                cargarListasGuardadas(); // Recargar listas
+            } catch (error) {
+                console.error("Error al eliminar la lista: ", error);
+                alert('Hubo un error al eliminar la lista.');
+            }
         }
     }
 });
