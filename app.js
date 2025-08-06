@@ -15,7 +15,7 @@ const db = getFirestore(app);
 
 const productos = [
     { nombre: "Huevo", precio: 0.75, unidad: "unidad" },
-    { nombre: "Yogurt griego natural", precio: 17.90, unidad: "1 litro" },
+    { nombre: "Yogurt griego natural", precio: 20.90, unidad: "1 litro" },
     { nombre: "Pollo", precio: 9.50, unidad: "1 kg" },
     { nombre: "Plátano", precio: 4.50, unidad: "1 kg" },
     { nombre: "Pescado", precio: 15.00, unidad: "1 kg" },
